@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SuperShop.Data.Ententies
 {
-    public class Product
+    public class Product : IEntity
     {
 
 

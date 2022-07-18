@@ -26,7 +26,7 @@ namespace SuperShop
             });
 
             services.AddTransient<SeedDB>();
-            services.AddScoped<IRepository,Repository>();
+            services.AddScoped<IProductsRepository,ProductsRepository>();
 
             services.AddControllersWithViews();
         }
