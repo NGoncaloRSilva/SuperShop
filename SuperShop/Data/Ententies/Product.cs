@@ -5,6 +5,8 @@ namespace SuperShop.Data.Ententies
 {
     public class Product
     {
+
+
         //Se for Id é automaticamente chave primária
         //Outro nome usa-se o key
         //[Key]
