@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Data;
 using SuperShop.Data.Ententies;
+using SuperShop.Helpers;
 
 namespace SuperShop.Controllers
 {
@@ -14,11 +15,13 @@ namespace SuperShop.Controllers
     {
         
         private readonly IProductsRepository _productsRepository;
+        private readonly IUserHelper _userHelper;
 
-        public ProductsController(IProductsRepository productsRepository)
+        public ProductsController(IProductsRepository productsRepository, IUserHelper userHelper)
         {
             
             _productsRepository = productsRepository;
+            _userHelper = userHelper;
         }
 
         
@@ -60,6 +63,8 @@ namespace SuperShop.Controllers
         {
             if (ModelState.IsValid)
             {
+                //TODO: Modificar para o que tiver logado
+                product.User = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
                 await _productsRepository.CreateAsync(product);
                 //No generic repository grava automaticamente
                 return RedirectToAction(nameof(Index));
@@ -99,7 +104,9 @@ namespace SuperShop.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
+                {   
+                    //TODO: Modificar para o que tiver logado
+                    product.User = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
                     await _productsRepository.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException)
