@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using SuperShop.Data;
 using SuperShop.Data.Ententies;
 using SuperShop.Helpers;
+using SuperShop.Models;
 
 namespace SuperShop.Controllers
 {
@@ -28,7 +30,7 @@ namespace SuperShop.Controllers
         // GET: Products
         public IActionResult Index()
         {
-            return View(_productsRepository.GetAll());
+            return View(_productsRepository.GetAll().OrderBy(p => p.Name));
         }
 
         // GET: Products/Details/5
@@ -59,17 +61,63 @@ namespace SuperShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(/*[Bind("Id,Name,Price,ImageUrl,LastPurchase,LastSale,IsAvailable,Stock")]*/ Product product)
+        public async Task<IActionResult> Create(/*[Bind("Id,Name,Price,ImageUrl,LastPurchase,LastSale,IsAvailable,Stock")]*/ ProductViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var path = string.Empty;
+
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                {
+
+                    var guid = Guid.NewGuid().ToString();
+                    var file = $"{guid}.jpg";
+
+
+                    path = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot\\images\\products",
+                        file);
+
+                    using(var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.ImageFile. CopyToAsync(stream);
+                    }
+                    
+                    path = $"~/images/products/{file}";
+
+                }
+
+
+                var product = this.toProduct(model, path);
+            
+        
+
                 //TODO: Modificar para o que tiver logado
                 product.User = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
                 await _productsRepository.CreateAsync(product);
                 //No generic repository grava automaticamente
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(model);
+        }
+
+        private Product toProduct(ProductViewModel model, string path)
+        {
+            return new Product
+            {
+                Id = model.Id,
+                ImageUrl = path,
+                IsAvailable = model.IsAvailable,
+                Name = model.Name,
+                LastPurchase = model.LastPurchase,
+                LastSale = model.LastSale,
+                Price = model.Price,
+                Stock = model.Stock,
+                User = model.User,
+
+            };
+                
         }
 
         // GET: Products/Edit/5
@@ -85,7 +133,24 @@ namespace SuperShop.Controllers
             {
                 return NotFound();
             }
-            return View(product);
+            var model = this.toProductViewModel(product);
+            return View(model);
+        }
+
+        private ProductViewModel toProductViewModel(Product product)
+        {
+            return new ProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                ImageUrl = product.ImageUrl,
+                IsAvailable = product.IsAvailable,
+                LastPurchase = product.LastPurchase,
+                LastSale = product.LastSale,
+                Price = product.Price,
+                Stock = product.Stock,
+                User = product.User
+            };
         }
 
 
@@ -94,24 +159,46 @@ namespace SuperShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, /*[Bind("Id,Name,Price,ImageUrl,LastPurchase,LastSale,IsAvailable,Stock")]*/ Product product)
+        public async Task<IActionResult> Edit(int id, /*[Bind("Id,Name,Price,ImageUrl,LastPurchase,LastSale,IsAvailable,Stock")]*/ProductViewModel model)
         {
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
+            
 
             if (ModelState.IsValid)
             {
                 try
-                {   
+                {
+                    var path = model.ImageUrl;
+
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        var guid = Guid.NewGuid().ToString();
+                        var file = $"{guid}.jpg";
+
+
+                        path = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot\\images\\products",
+                            file);
+
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await model.ImageFile.CopyToAsync(stream);
+                        }
+
+                        path = $"~/images/products/{file}";
+
+                    }
+
+
+                    var product = this.toProduct(model, path);
+
                     //TODO: Modificar para o que tiver logado
                     product.User = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
                     await _productsRepository.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (! await _productsRepository.ExistAsync(product.Id))
+                    if (! await _productsRepository.ExistAsync(model.Id))
                     { 
                         return NotFound();
                     }
@@ -122,7 +209,7 @@ namespace SuperShop.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(model);
         }
 
 
