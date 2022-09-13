@@ -90,7 +90,7 @@ namespace SuperShop.Controllers
         
 
                 //TODO: Modificar para o que tiver logado
-                product.User = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
+                product.User = await _userHelper.GetUserbyEmailAsync(this.User.Identity.Name);
                 await _productsRepository.CreateAsync(product);
                 //No generic repository grava automaticamente
                 return RedirectToAction(nameof(Index));
@@ -144,8 +144,8 @@ namespace SuperShop.Controllers
 
                     var product = _converterHelper.toProduct(model, imageId, false);
 
-                    //TODO: Modificar para o que tiver logado
-                    product.User = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
+                    
+                    product.User = await _userHelper.GetUserbyEmailAsync(this.User.Identity.Name);
                     await _productsRepository.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException)
