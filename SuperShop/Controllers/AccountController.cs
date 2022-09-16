@@ -73,7 +73,10 @@ namespace SuperShop.Controllers
                         LastName = model.LastName,
                         Email = model.Username,
                         UserName = model.Username
+                        
                     };
+
+                    await _userHelper.AddUserToRoleAsync(user, "Customer");
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
 
