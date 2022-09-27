@@ -57,12 +57,14 @@ namespace SuperShop
 
             services.AddScoped<IProductsRepository,ProductsRepository>();
 
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/NotAuthorized";
+                options.AccessDeniedPath = "/Account/NotAuthorized";
+            });
+
             services.AddControllersWithViews();
-            //services.AddAzureClients(builder =>
-            //{
-            //    builder.AddBlobServiceClient(Configuration["Blob:ConnectionString:blob"], preferMsi: true);
-            //    builder.AddQueueServiceClient(Configuration["Blob:ConnectionString:queue"], preferMsi: true);
-            //});
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,6 +80,9 @@ namespace SuperShop
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseStatusCodePagesWithReExecute("/error/{0}"); 
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -95,29 +100,5 @@ namespace SuperShop
             });
         }
     }
-    //internal static class StartupExtensions
-    //{
-    //    public static IAzureClientBuilder<BlobServiceClient, BlobClientOptions> AddBlobServiceClient(this AzureClientFactoryBuilder builder, string serviceUriOrConnectionString, bool preferMsi)
-    //    {
-    //        if (preferMsi && Uri.TryCreate(serviceUriOrConnectionString, UriKind.Absolute, out Uri serviceUri))
-    //        {
-    //            return builder.AddBlobServiceClient(serviceUri);
-    //        }
-    //        else
-    //        {
-    //            return builder.AddBlobServiceClient(serviceUriOrConnectionString);
-    //        }
-    //    }
-    //    public static IAzureClientBuilder<QueueServiceClient, QueueClientOptions> AddQueueServiceClient(this AzureClientFactoryBuilder builder, string serviceUriOrConnectionString, bool preferMsi)
-    //    {
-    //        if (preferMsi && Uri.TryCreate(serviceUriOrConnectionString, UriKind.Absolute, out Uri serviceUri))
-    //        {
-    //            return builder.AddQueueServiceClient(serviceUri);
-    //        }
-    //        else
-    //        {
-    //            return builder.AddQueueServiceClient(serviceUriOrConnectionString);
-    //        }
-    //    }
-    //}
+    
 }
