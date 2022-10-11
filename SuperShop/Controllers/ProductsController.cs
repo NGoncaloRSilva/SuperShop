@@ -151,8 +151,8 @@ namespace SuperShop.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (! await _productsRepository.ExistAsync(model.Id))
-                    { 
-                        return NotFound();
+                    {
+                        return new NotFoundViewResult("ProductNotFound");
                     }
                     else
                     {
