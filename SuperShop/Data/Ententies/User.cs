@@ -13,6 +13,7 @@ namespace SuperShop.Data.Ententies
         [MaxLength(100, ErrorMessage = "The {0} field can not have more than {1} characters.")]
         public string Address { get; set; }
 
+
         public int CityId { get; set; }
 
         //Chave estrangeira não pode ter nulos
