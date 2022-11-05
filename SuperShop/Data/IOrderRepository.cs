@@ -17,9 +17,11 @@ namespace SuperShop.Data
 
         Task DeleteDetailtempAsync(int id);
 
+        Task<bool> ConfirmOrderAsync(string username);
 
 
-        Task<IQueryable<Order>> GetOrderByUserNameAsync(string userName);
-        Task<IQueryable<OrderDetailTemp>> GetDetailsTempsByUserNameAsync(string userName);
+        Task DeliveryOrder(DeliveryViewModel model);
+
+        Task<Order> GetOrderAsync(int id);  
     }
 }

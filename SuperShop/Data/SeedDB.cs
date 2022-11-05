@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SuperShop.Data.Ententies;
 using SuperShop.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,6 +29,22 @@ namespace SuperShop.Data
             await _userHelper.CheckRoleAsync("Admin");
             await _userHelper.CheckRoleAsync("Customer");
 
+            if(!_contex.Countries.Any())
+            {
+                var cities = new List<City>();
+                cities.Add(new City { Name = "Lisboa" });
+                cities.Add(new City { Name = "Porto" });
+                cities.Add(new City { Name = "Faro" });
+
+                _contex.Countries.Add(new Country
+                {
+                    Cities = cities,
+                    Name = "Portugal"
+                });
+
+                await _contex.SaveChangesAsync();
+            }
+
             var user = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
             if (user == null)
             {
@@ -37,7 +54,10 @@ namespace SuperShop.Data
                     LastName = "Silva",
                     Email = "ngoncalorsilva@gmail.com",
                     UserName = "ngoncalorsilva@gmail.com",
-                    PhoneNumber = "212344555"
+                    PhoneNumber = "212344555",
+                    Address = "Rua Jau",
+                    CityId = _contex.Countries.FirstOrDefault().Cities.FirstOrDefault().Id,  
+                    City = _contex.Countries.FirstOrDefault().Cities.FirstOrDefault()
                 };
 
                 var result = await _userHelper.AddUserAsync(user, "123456");
@@ -68,7 +88,9 @@ namespace SuperShop.Data
                     LastName = "Ricardo",
                     Email = "joaoricardo@gmail.com",
                     UserName = "joaoricardo@gmail.com",
-                    PhoneNumber = "212344555"
+                    PhoneNumber = "212344555",
+                    CityId = _contex.Countries.FirstOrDefault().Cities.FirstOrDefault().Id,
+                    City = _contex.Countries.FirstOrDefault().Cities.FirstOrDefault()
                 };
 
                 var result = await _userHelper.AddUserAsync(user2, "123456");

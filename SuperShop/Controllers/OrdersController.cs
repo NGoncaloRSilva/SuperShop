@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SuperShop.Data;
 using SuperShop.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace SuperShop.Controllers
@@ -88,6 +89,52 @@ namespace SuperShop.Controllers
 
             await _orderRepository.ModifyOrderDetailTempQuantity(id.Value, -1);
             return RedirectToAction("Create");
+        }
+
+
+        public async Task<IActionResult> ConfirmOrder()
+        {
+            var response = await _orderRepository.ConfirmOrderAsync(this.User.Identity.Name);
+            if (response)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return RedirectToAction("Create");
+
+        }
+
+        public async Task<IActionResult> Deliver(int? id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            var order =  await _orderRepository.GetOrderAsync(id.Value);
+
+            var model = new DeliveryViewModel
+            {
+                Id = order.Id,
+                DeliveryDate = DateTime.Today
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Deliver(DeliveryViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _orderRepository.DeliveryOrder(model);
+
+                return RedirectToAction("Index");
+            }
+
+            
+
+            return View();
         }
 
     }
