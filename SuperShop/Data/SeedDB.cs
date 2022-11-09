@@ -45,15 +45,15 @@ namespace SuperShop.Data
                 await _contex.SaveChangesAsync();
             }
 
-            var user = await _userHelper.GetUserbyEmailAsync("ngoncalorsilva@gmail.com");
+            var user = await _userHelper.GetUserbyEmailAsync("ngoncalorsilvabusiness@gmail.com");
             if (user == null)
             {
                 user = new User
                 {
                     FirstName = "Nuno",
                     LastName = "Silva",
-                    Email = "ngoncalorsilva@gmail.com",
-                    UserName = "ngoncalorsilva@gmail.com",
+                    Email = "ngoncalorsilvabusiness@gmail.com",
+                    UserName = "ngoncalorsilvabusiness@gmail.com",
                     PhoneNumber = "212344555",
                     Address = "Rua Jau",
                     CityId = _contex.Countries.FirstOrDefault().Cities.FirstOrDefault().Id,  
@@ -68,6 +68,8 @@ namespace SuperShop.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
             }
 
             var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
@@ -79,15 +81,15 @@ namespace SuperShop.Data
 
             //Criação customer
 
-            var user2 = await _userHelper.GetUserbyEmailAsync("joaoricardo@gmail.com");
+            var user2 = await _userHelper.GetUserbyEmailAsync("luissouza@yopmail.com");
             if (user2 == null)
             {
                 user2 = new User
                 {
                     FirstName = "Joao",
                     LastName = "Ricardo",
-                    Email = "joaoricardo@gmail.com",
-                    UserName = "joaoricardo@gmail.com",
+                    Email = "luissouza@yopmail.com",
+                    UserName = "luissouza@yopmail.com",
                     PhoneNumber = "212344555",
                     CityId = _contex.Countries.FirstOrDefault().Cities.FirstOrDefault().Id,
                     City = _contex.Countries.FirstOrDefault().Cities.FirstOrDefault()
@@ -101,6 +103,8 @@ namespace SuperShop.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user2, "Customer");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
             }
 
             var isInRole2 = await _userHelper.IsUserInRoleAsync(user, "Customer");

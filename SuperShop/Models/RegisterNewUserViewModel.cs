@@ -25,11 +25,11 @@ namespace SuperShop.Models
         [MaxLength(100, ErrorMessage = "The {0} field can not have more than {1} characters.")]
         public string PhoneNumber { get; set; }
 
-        [Display(Name = "First Name")]
+        [Display(Name = "City")]
         [Range(1, int.MaxValue, ErrorMessage = "You must Select a City.")]
         public int CityId { get; set; }
 
-        [Display(Name = "First Name")]
+        [Display(Name = "Country")]
         [Range(1, int.MaxValue, ErrorMessage = "You must Select a Country.")]
         public int CountryId { get; set; }
 

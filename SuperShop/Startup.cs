@@ -13,6 +13,8 @@ using Microsoft.Extensions.Azure;
 using Azure.Storage.Queues;
 using Azure.Storage.Blobs;
 using Azure.Core.Extensions;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace SuperShop
 {
@@ -30,6 +32,9 @@ namespace SuperShop
         {
             services.AddIdentity<User, IdentityRole>(cfg =>
              {
+                 cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                 cfg.SignIn.RequireConfirmedEmail = true;
+
                  cfg.User.RequireUniqueEmail = true;    
                  cfg.Password.RequireDigit = false;
                  cfg.Password.RequireUppercase = false;
@@ -39,9 +44,21 @@ namespace SuperShop
                  cfg.Password.RequiredLength = 6;
              })
 
+            .AddDefaultTokenProviders()
             .AddEntityFrameworkStores<DataContext>();
 
-
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = this.Configuration["Tokens:Issuer"],
+                        ValidAudience = this.Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                    };
+                });
 
             services.AddDbContext<DataContext>(cfg =>
             {
@@ -58,6 +75,7 @@ namespace SuperShop
             services.AddScoped<IProductsRepository,ProductsRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<IMailHelper, MailHelper>();
 
             services.ConfigureApplicationCookie(options =>
             {
